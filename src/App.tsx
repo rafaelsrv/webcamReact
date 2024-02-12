@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Header from './components/Header';
 import LoadingSpinner from './components/LoadingSpinner';
 import * as faceapi from 'face-api.js';
 
 function App() {
-
+  const [expression, setExpression] = useState('')
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   console.log(videoRef.current)
@@ -40,10 +40,16 @@ function App() {
 
     const detection = await faceapi.detectSingleFace(
       videoEl as HTMLVideoElement, new faceapi.TinyFaceDetectorOptions()
-    );
-    console.log(detection)
+    ).withFaceLandmarks().withFaceExpressions();
+    
 
     if(detection){
+      
+      
+      const dominantExpression = detection.expressions.asSortedArray()[0]
+      setExpression(dominantExpression.expression)
+      
+      
       const dimensions ={
         width: videoEl?.offsetWidth,
         height: videoEl?.offsetHeight,
@@ -52,6 +58,8 @@ function App() {
      faceapi.matchDimensions(canvasEl, dimensions)
      const resizedResults = faceapi.resizeResults(detection, dimensions);
      faceapi.draw.drawDetections(canvasEl, resizedResults);
+     faceapi.draw.drawFaceLandmarks(canvasEl, resizedResults);
+     faceapi.draw.drawFaceExpressions(canvasEl,resizedResults);
      };
      setTimeout(handleLoadMetaData, 1000)
     }
@@ -76,9 +84,9 @@ function App() {
         <div
           className={`bg-white rounded-xl px-8 py-6 flex gap-6 lg:gap-20 items-center h-[200px] justify-center`}
         >
-          <p className="text-4xl text-center flex justify-center items-center text-yellow-300">
-            {/* Substitua pelo texto */}
-            <LoadingSpinner />
+          <p className="text-4xl text-center flex justify-center items-center">
+            Sua expressão é: {expression}
+            
             {/* Substitua pelo texto */}
           </p>
         </div>
