@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import Header from './components/Header';
 import LoadingSpinner from './components/LoadingSpinner';
+import * as faceapi from 'face-api.js';
 
 function App() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   console.log(videoRef.current)
  
   useEffect(() => {
@@ -12,11 +14,49 @@ function App() {
       const videoEl = videoRef.current;
       if(videoEl){
         videoEl.srcObject = stream;
-        videoEl.play()
+        
       }
     })
     
   },[])
+
+  useEffect(() => {
+    Promise.all([
+      faceapi.loadTinyFaceDetectorModel('/models'),
+      faceapi.loadFaceLandmarkModel('/models'),
+      faceapi.loadFaceExpressionModel('/models'),
+    ]).then(()=>{
+      console.log('Models Loaded')
+    })
+    
+  }, []);
+
+
+  async function handleLoadMetaData(){
+    const canvasEl = canvasRef.current as HTMLCanvasElement;
+    const videoEl = videoRef.current as HTMLVideoElement;
+    if(!videoEl || !canvasEl) return;
+
+
+    const detection = await faceapi.detectSingleFace(
+      videoEl as HTMLVideoElement, new faceapi.TinyFaceDetectorOptions()
+    );
+    console.log(detection)
+
+    if(detection){
+      const dimensions ={
+        width: videoEl?.offsetWidth,
+        height: videoEl?.offsetHeight,
+      };
+     
+     faceapi.matchDimensions(canvasEl, dimensions)
+     const resizedResults = faceapi.resizeResults(detection, dimensions);
+     faceapi.draw.drawDetections(canvasEl, resizedResults);
+     };
+     setTimeout(handleLoadMetaData, 1000)
+    }
+  
+
   return (
     <main className="min-h-screen flex flex-col lg:flex-row md:justify-between gap-14 xl:gap-40 p-10 items-center container mx-auto">
       <Header />
@@ -24,8 +64,13 @@ function App() {
         <div className="bg-white rounded-xl p-2">
           <div className="relative flex items-center justify-center aspect-video w-full">
             {/* Substitua pela Webcam */}
-            <div className="aspect-video rounded-lg bg-gray-300 w-full"></div>
-            <video ref={videoRef}></video>
+            <div className="aspect-video rounded-lg bg-gray-300 w-full">
+              <div className='relative flex items-center justify-center w-full aspect-video'>
+                <video onLoadedMetadata={handleLoadMetaData} autoPlay ref={videoRef} className='rounded aspect-video'></video>
+                <canvas ref={canvasRef} className='absolute inset-0 w-full h-full'></canvas>
+              </div>
+            
+            </div>
           </div>
         </div>
         <div
