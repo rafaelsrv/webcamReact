@@ -61,7 +61,7 @@ function App() {
      faceapi.matchDimensions(canvasEl, dimensions)
      const resizedResults = faceapi.resizeResults(detection, dimensions);
      faceapi.draw.drawDetections(canvasEl, resizedResults);
-     faceapi.draw.drawFaceLandmarks(canvasEl, resizedResults);
+    //  faceapi.draw.drawFaceLandmarks(canvasEl, resizedResults);
      faceapi.draw.drawFaceExpressions(canvasEl,resizedResults);
      setLoading(false)
      };
@@ -75,10 +75,9 @@ function App() {
       <section className="flex flex-col gap-6 flex-1 w-full">
         <div className="bg-white rounded-xl p-2">
           <div className="relative flex items-center justify-center aspect-video w-full">
-            {/* Substitua pela Webcam */}
             <div className="aspect-video rounded-lg bg-gray-300 w-full">
               <div className='relative flex items-center justify-center w-full aspect-video'>
-                <video onLoadedMetadata={handleLoadMetaData} autoPlay ref={videoRef} className='rounded aspect-video'></video>
+                <video onLoadedMetadata={handleLoadMetaData} autoPlay ref={videoRef} className='rounded w-full' ></video>
                 <canvas ref={canvasRef} className='absolute inset-0 w-full h-full'></canvas>
               </div>
             
