@@ -1,7 +1,22 @@
+import { useEffect, useRef } from 'react';
 import Header from './components/Header';
 import LoadingSpinner from './components/LoadingSpinner';
 
 function App() {
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  console.log(videoRef.current)
+ 
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia({video:true}).then((stream)=>{
+      const videoEl = videoRef.current;
+      if(videoEl){
+        videoEl.srcObject = stream;
+        videoEl.play()
+      }
+    })
+    
+  },[])
   return (
     <main className="min-h-screen flex flex-col lg:flex-row md:justify-between gap-14 xl:gap-40 p-10 items-center container mx-auto">
       <Header />
@@ -10,7 +25,7 @@ function App() {
           <div className="relative flex items-center justify-center aspect-video w-full">
             {/* Substitua pela Webcam */}
             <div className="aspect-video rounded-lg bg-gray-300 w-full"></div>
-            {/* Substitua pela Webcam */}
+            <video ref={videoRef}></video>
           </div>
         </div>
         <div
