@@ -70,7 +70,7 @@ function App() {
   
 
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row md:justify-between gap-14 xl:gap-40 p-10 items-center container mx-auto">
+    <main className="min-h-screen  flex flex-col lg:flex-row md:justify-between gap-14 xl:gap-40 p-10 items-center container mx-auto">
       <Header />
       <section className="flex flex-col gap-6 flex-1 w-full">
         <div className="bg-white rounded-xl p-2">
